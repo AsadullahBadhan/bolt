@@ -1,4 +1,5 @@
-import { Player } from './player.js'
+import { Player } from './player.js';
+import { InputHandler } from './inputHandler.js';
 
 window.addEventListener('load', function () {
   const canvas = document.getElementById('canvas1');
@@ -14,10 +15,12 @@ window.addEventListener('load', function () {
       this.width = width;
       this.height = height;
       this.player = new Player(this);
+      this.input = new InputHandler();
     }
 
-    update() {
-      this.player.update();
+    update(delta) {
+      this.player.update(delta, this.input.keys);
+
     }
 
     draw(context) {
@@ -26,13 +29,17 @@ window.addEventListener('load', function () {
   }
 
   const game = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
+  let lastTime = 0;
 
-  function animate() {
+  function animate(timeStamp) {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    game.update()
+    const delta = timeStamp - lastTime;
+    lastTime = timeStamp;
+    // console.log(delta)
+    game.update(delta);
     game.draw(ctx)
     requestAnimationFrame(animate)
   }
 
-  animate();
+  animate(0);
 });

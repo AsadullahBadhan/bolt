@@ -24,9 +24,9 @@ export class Standing extends State {
   }
 
   handleInput(input) {
-    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING);
-    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING);
-    else if (input.includes('ArrowDown')) this.player.setState(state.SITTING);
+    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING, 1);
+    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
+    else if (input.includes('ArrowDown')) this.player.setState(state.SITTING, 0);
   }
 }
 
@@ -42,8 +42,8 @@ export class Running extends State {
   }
 
   handleInput(input) {
-    if (input.length === 0) this.player.setState(state.STANDING);
-    if (input.includes('ArrowUp')) this.player.setState(state.JUMPING);
+    if (input.length === 0) this.player.setState(state.STANDING, 0);
+    if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
   }
 }
 
@@ -61,7 +61,7 @@ export class Jumping extends State {
   }
 
   handleInput(input) {
-    if (this.player.vy > this.player.weight) this.player.setState(state.FALLING);
+    if (this.player.vy > this.player.weight) this.player.setState(state.FALLING, 1);
   }
 }
 
@@ -77,7 +77,7 @@ export class Falling extends State {
   }
 
   handleInput(input) {
-    if (this.player.onGround()) this.player.setState(state.STANDING)
+    if (this.player.onGround()) this.player.setState(state.STANDING, 0)
   }
 }
 
@@ -94,7 +94,7 @@ export class Sitting extends State {
   }
 
   handleInput(input) {
-    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING);
-    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING);
+    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING, 1);
+    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
   }
 }

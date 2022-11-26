@@ -6,7 +6,7 @@ export class Player {
     this.width = 100;
     this.height = 91.3;
     this.x = 10;
-    this.y = this.game.height - this.height;
+    this.y = this.game.height - this.height - this.game.baseline;
     this.speed = 0;
     this.maxSpeed = 10;
     this.vy = 0;
@@ -21,7 +21,6 @@ export class Player {
     this.states = [new Standing(this), new Running(this), new Jumping(this), new Falling(this), new Sitting(this)];
     this.currentState = this.states[0];
     this.currentState.enter();
-
   }
 
   update(delta, input) {
@@ -40,7 +39,7 @@ export class Player {
     this.y += this.vy;
     if (!this.onGround()) this.vy += this.weight;
     else this.vy = 0;
-    if (this.y > this.game.height - this.height) this.y = this.game.height - this.height;
+    if (this.y > this.game.height - this.height - this.game.baseline) this.y = this.game.height - this.height - this.game.baseline;
 
     if (this.frameTimer > this.frameInterval) {
       if (this.frameX < this.maxFrame) this.frameX++;
@@ -56,12 +55,13 @@ export class Player {
 
   onGround() {
     return (
-      this.y >= this.game.height - this.height
+      this.y >= this.game.height - this.height - this.game.baseline
     )
   }
 
-  setState(state) {
+  setState(state, speed) {
     this.currentState = this.states[state];
+    this.game.speed = this.game.maxSpeed * speed;
     this.currentState.enter();
   }
 }

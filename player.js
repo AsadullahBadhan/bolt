@@ -49,7 +49,7 @@ export class Player {
   }
 
   draw(context) {
-    // context.strokeRect(this.x, this.y, this.width, this.height);
+    if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
     context.drawImage(this.image, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
   }
 

@@ -17,7 +17,7 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	max-width: 100%;
+	max-width: 90%;
 	max-height: 100%;
 }
 
@@ -26,6 +26,9 @@
 #layer2,
 #layer3,
 #layer4,
-#layer5 {
+#layer5,
+#enemy-fly,
+#enemy-plant,
+#enemy-spider {
 	display: none;
 }

@@ -1,100 +1,129 @@
+import { Dust, Fire } from './particle.js';
+
 const state = {
   STANDING: 0,
   RUNNING: 1,
   JUMPING: 2,
   FALLING: 3,
-  SITTING: 4
+  SITTING: 4,
+  ROLLING: 5,
+  DIVING: 6,
+  HIT: 7
 }
 
 class State {
-  constructor(state) {
+  constructor(state, game) {
     this.state = state;
+    this.game = game;
   }
 }
 
 export class Standing extends State {
-  constructor(player) {
-    super('STANDING');
-    this.player = player;
+  constructor(game) {
+    super('STANDING', game);
   }
 
   enter() {
-    this.player.frameY = 0;
-    this.player.maxFrame = 6;
+    this.game.player.frameY = 0;
+    this.game.player.maxFrame = 6;
   }
 
   handleInput(input) {
-    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING, 1);
-    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
-    else if (input.includes('ArrowDown')) this.player.setState(state.SITTING, 0);
+    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.game.player.setState(state.RUNNING, 1);
+    else if (input.includes('ArrowUp')) this.game.player.setState(state.JUMPING, 1);
+    else if (input.includes('ArrowDown')) this.game.player.setState(state.SITTING, 0);
+    else if (input.includes('Enter')) this.game.player.setState(state.ROLLING, 2);
   }
 }
 
 export class Running extends State {
-  constructor(player) {
-    super('RUNNING');
-    this.player = player;
+  constructor(game) {
+    super('RUNNING', game);
   }
 
   enter() {
-    this.player.frameY = 3;
-    this.player.maxFrame = 8;
+    this.game.player.frameY = 3;
+    this.game.player.maxFrame = 8;
+
   }
 
   handleInput(input) {
-    if (input.length === 0) this.player.setState(state.STANDING, 0);
-    if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
+    this.game.particles.push(new Dust(this.game, this.game.player.x + this.game.player.width / 2, this.game.player.y + this.game.player.height));
+    if (input.length === 0) this.game.player.setState(state.STANDING, 0);
+    if (input.includes('ArrowUp')) this.game.player.setState(state.JUMPING, 1);
+    else if (input.includes('Enter')) this.game.player.setState(state.ROLLING, 2);
   }
 }
 
 export class Jumping extends State {
-  constructor(player) {
-    super('JUMPING');
-    this.player = player;
+  constructor(game) {
+    super('JUMPING', game);
   }
 
   enter() {
-    this.player.frameY = 1;
-    this.player.maxFrame = 6;
-    this.player.speed = 5;
-    if (this.player.onGround()) this.player.vy = -20;
+    this.game.player.frameY = 1;
+    this.game.player.maxFrame = 6;
+    this.game.player.speed = 5;
+    if (this.game.player.onGround()) this.game.player.vy -= 25;
   }
 
   handleInput(input) {
-    if (this.player.vy > this.player.weight) this.player.setState(state.FALLING, 1);
+    if (this.game.player.vy > this.game.player.weight) this.game.player.setState(state.FALLING, 1);
+    else if (input.includes('Enter')) this.game.player.setState(state.ROLLING, 2);
   }
 }
 
 export class Falling extends State {
-  constructor(player) {
-    super('FALLING');
-    this.player = player;
+  constructor(game) {
+    super('FALLING', game);
   }
 
   enter() {
-    this.player.frameY = 2;
-    this.player.maxFrame = 6;
+    this.game.player.frameY = 2;
+    this.game.player.maxFrame = 6;
   }
 
   handleInput(input) {
-    if (this.player.onGround()) this.player.setState(state.STANDING, 0)
+    if (this.game.player.onGround()) this.game.player.setState(state.STANDING, 0)
   }
 }
 
 
 export class Sitting extends State {
-  constructor(player) {
-    super('SITTING');
-    this.player = player;
+  constructor(game) {
+    super('SITTING', game);
   }
 
   enter() {
-    this.player.frameY = 5;
-    this.player.maxFrame = 4;
+    this.game.player.frameY = 5;
+    this.game.player.maxFrame = 4;
   }
 
   handleInput(input) {
-    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.player.setState(state.RUNNING, 1);
-    else if (input.includes('ArrowUp')) this.player.setState(state.JUMPING, 1);
+    if (input.includes('ArrowRight') || input.includes('ArrowLeft')) this.game.player.setState(state.RUNNING, 1);
+    else if (input.includes('ArrowUp')) this.game.player.setState(state.JUMPING, 1);
+    else if (input.includes('Enter')) this.game.player.setState(state.ROLLING, 2);
+  }
+}
+
+export class Rolling extends State {
+  constructor(game) {
+    super('ROLLING', game);
+  }
+
+  enter() {
+    this.game.player.frameY = 6;
+    this.game.player.maxFrame = 6;
+  }
+
+  handleInput(input) {
+    this.game.particles.push(new Fire(this.game, this.game.player.x, this.game.player.y));
+    if (!input.includes('Enter') && this.game.player.onGround()) {
+      this.game.player.setState(state.RUNNING, 1);
+    } else if (!input.includes('Enter') && !this.game.player.onGround()) {
+      this.game.player.setState(state.FALLING, 1)
+    } else if (input.includes('Enter') && this.game.player.onGround() && input.includes('ArrowUp')) {
+      this.game.player.vy -= 27;
+    }
   }
 }

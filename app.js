@@ -24,20 +24,19 @@ window.addEventListener('load', function () {
       this.background = new Background(this);
       this.player = new Player(this);
       this.input = new InputHandler(this);
+      this.particles = [];
       this.enemies = [];
       this.enemyTimer = 0;
       this.enemyInterval = 1000;
       this.dubug = false;
+      this.player.currentState = this.player.states[0];
+      this.player.currentState.enter();
     }
 
     update(delta) {
       this.player.update(delta, this.input.keys);
       this.background.update();
 
-      this.enemies.forEach(enemy => {
-        enemy.update(delta);
-      })
-      this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion)
       //add enemy to the game
       if (this.enemyTimer > this.enemyInterval) {
         this.enemyTimer = 0;
@@ -45,6 +44,16 @@ window.addEventListener('load', function () {
       } else {
         this.enemyTimer += delta;
       }
+      this.enemies.forEach(enemy => {
+        enemy.update(delta);
+      })
+      this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion)
+
+      //handle particle
+      this.particles.forEach((particle, index) => {
+        particle.update();
+        if (particle.markedForDeletion) this.particles.splice(index, 1);
+      })
     }
 
     draw(context) {
@@ -52,6 +61,9 @@ window.addEventListener('load', function () {
       this.player.draw(context);
       this.enemies.forEach(enemy => {
         enemy.draw(context);
+      })
+      this.particles.forEach((particle) => {
+        particle.draw(context);
       })
     }
 
@@ -66,7 +78,6 @@ window.addEventListener('load', function () {
   }
 
   const game = new Game(CANVAS_WIDTH, CANVAS_HEIGHT);
-  console.log(game)
   let lastTime = 0;
 
   function animate(timeStamp) {
